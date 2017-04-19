@@ -79,7 +79,7 @@ update msg model =
             ( { model | highlight = Maybe.withDefault model.highlight (List.head (List.reverse highlights)) }, Cmd.none )
 
         InputBlur ->
-            { model | focus = True } ! [ sendInput "<FocusLost>", Dom.focus "input" |> Task.perform (always NoOp) (always NoOp) ]
+            { model | focus = True } ! [ (sendInput "<FocusLost>"), Dom.focus "input" |> Task.attempt (always NoOp) ]
 
         InputFocus ->
             ( { model | focus = False }, sendInput "<FocusGained>" )
@@ -126,7 +126,7 @@ update msg model =
                 ( { model | console = console, cursor = cursor }, Cmd.none )
 
         Ready ->
-            model ! [ attach model.columns model.lines, Dom.focus "input" |> Task.perform (always NoOp) (always NoOp) ]
+            model ! [ attach model.columns model.lines, Dom.focus "input" |> Task.attempt (always NoOp) ]
 
         Resize columns lines ->
             let

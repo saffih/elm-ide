@@ -68,7 +68,7 @@ viewConsole model =
         cell index ( string, highlight ) =
             let
                 column =
-                    (index `rem` model.columns)
+                    (rem index model.columns)
 
                 line =
                     (index // model.columns)

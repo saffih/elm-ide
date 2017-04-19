@@ -1,15 +1,15 @@
 port module Notification exposing (sub)
 
-import Bitwise exposing (and, shiftRight)
+import Bitwise exposing (and, shiftRightBy)
 import Color exposing (Color, rgb)
-import Json.Decode as JD exposing ((:=))
+import Json.Decode as JD exposing (field)
 import Types exposing (..)
 
 port notifications : (String -> msg) -> Sub msg
 
 intToColor : Int -> Color
 intToColor int =
-    rgb (and (shiftRight int 16) 255) (and (shiftRight int 8) 255) (and int 255)
+    rgb (and (shiftRightBy int 16) 255) (and (shiftRightBy int 8) 255) (and int 255)
 
 sub : Sub Msg
 sub =
@@ -59,7 +59,7 @@ decode notification =
 
 first : JD.Decoder a -> JD.Decoder a
 first decoder =
-    JD.tuple1 identity decoder
+    JD.map identity decoder
 
 
 systemError : JD.Decoder Msg
@@ -83,25 +83,25 @@ systemReady =
 redrawUpdateBg : JD.Decoder Msg
 redrawUpdateBg =
     JD.at [ "redraw", "update_bg" ] <|
-        first (JD.tuple1 (UpdateBg << intToColor) JD.int)
+        first (JD.map (UpdateBg << intToColor) JD.int)
 
 
 redrawUpdateFg : JD.Decoder Msg
 redrawUpdateFg =
     JD.at [ "redraw", "update_fg" ] <|
-        first (JD.tuple1 (UpdateFg << intToColor) JD.int)
+        first (JD.map (UpdateFg << intToColor) JD.int)
 
 
 redrawUpdateSp : JD.Decoder Msg
 redrawUpdateSp =
     JD.at [ "redraw", "update_sp" ] <|
-        first (JD.tuple1 (UpdateSp << intToColor) JD.int)
+        first (JD.map (UpdateSp << intToColor) JD.int)
 
 
 redrawResize : JD.Decoder Msg
 redrawResize =
     JD.at [ "redraw", "resize" ] <|
-        first (JD.tuple2 Resize JD.int JD.int)
+        first (JD.map2 Resize JD.int JD.int)
 
 
 redrawClear : JD.Decoder Msg
@@ -119,7 +119,7 @@ redrawEolClear =
 redrawCursorGoto : JD.Decoder Msg
 redrawCursorGoto =
     JD.at [ "redraw", "cursor_goto" ] <|
-        first (JD.tuple2 CursorGoto JD.int JD.int)
+        first (JD.map2 CursorGoto JD.int JD.int)
 
 
 redrawPut : JD.Decoder Msg
@@ -138,15 +138,15 @@ redrawHighlightSet =
                 (Maybe.map intToColor sp)
 
         highlight =
-            JD.object8 parseColors
-                (JD.maybe ("foreground" := JD.int))
-                (JD.maybe ("background" := JD.int))
-                (JD.maybe ("special" := JD.int))
-                (JD.maybe ("bold" := JD.bool))
-                (JD.maybe ("italic" := JD.bool))
-                (JD.maybe ("underline" := JD.bool))
-                (JD.maybe ("undercurl" := JD.bool))
-                (JD.maybe ("reverse" := JD.bool))
+            JD.map8 parseColors
+                (JD.maybe (field "foreground" JD.int))
+                (JD.maybe (field "background" JD.int))
+                (JD.maybe (field "special"  JD.int))
+                (JD.maybe (field "bold" JD.bool))
+                (JD.maybe (field "italic" JD.bool))
+                (JD.maybe (field "underline" JD.bool))
+                (JD.maybe (field "undercurl" JD.bool))
+                (JD.maybe (field "reverse" JD.bool))
     in
         JD.at [ "redraw", "highlight_set" ] <|
             JD.map HighlightSet (JD.list (first highlight))
@@ -155,13 +155,13 @@ redrawHighlightSet =
 redrawScroll : JD.Decoder Msg
 redrawScroll =
     JD.at [ "redraw", "scroll" ] <|
-        first (JD.tuple1 Scroll JD.int)
+        first (JD.map Scroll JD.int)
 
 
 redrawSetScrollRegion : JD.Decoder Msg
 redrawSetScrollRegion =
     JD.at [ "redraw", "set_scroll_region" ] <|
-        first (JD.tuple4 SetScrollRegion JD.int JD.int JD.int JD.int)
+        first (JD.map4 SetScrollRegion JD.int JD.int JD.int JD.int)
 
 
 redrawModeChange : JD.Decoder Msg
