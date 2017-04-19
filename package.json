@@ -5,7 +5,7 @@
     "main": "app/electron.js",
     "scripts": {
         "elm-watch": "nodemon --exec elm make src/Main.elm --output app/elm.js -w src -e elm --quiet",
-        "elm-make" : "elm make src/Main.elm --output app/elm.js",
+        "elm-make": "elm make src/Main.elm --output app/elm.js",
         "start": "electron ."
     },
     "repository": {
@@ -22,7 +22,7 @@
     },
     "homepage": "https://github.com/elmcast/elm-ide#readme",
     "devDependencies": {
-        "electron": "^1.4.3",
+        "electron": "^1.6.5",
         "nodemon": "^1.11.0"
     },
     "dependencies": {
